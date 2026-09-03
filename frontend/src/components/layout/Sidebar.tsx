@@ -121,14 +121,24 @@ export function Sidebar() {
   return (
     <AnimatePresence mode="wait">
       {sidebarOpen && (
-        <motion.div
-          initial={{ width: 0, opacity: 0 }}
-          animate={{ width: 260, opacity: 1 }}
-          exit={{ width: 0, opacity: 0 }}
-          transition={{ duration: 0.3, ease: 'easeInOut' }}
-          className="h-full border-r border-border/50 glass-panel flex flex-col shrink-0 overflow-hidden z-20"
-        >
-          {/* Header */}
+        <>
+          {/* Mobile backdrop */}
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={toggleSidebar}
+            className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm md:hidden"
+          />
+          
+          <motion.div
+            initial={{ width: 0, opacity: 0 }}
+            animate={{ width: 260, opacity: 1 }}
+            exit={{ width: 0, opacity: 0 }}
+            transition={{ duration: 0.3, ease: 'easeInOut' }}
+            className="fixed inset-y-0 left-0 z-50 md:relative h-full border-r border-border/50 glass-panel flex flex-col shrink-0 overflow-hidden bg-background md:bg-transparent"
+          >
+            {/* Header */}
           <div className="flex h-14 items-center justify-between px-4">
             <Link to="/" className="flex items-center gap-2 font-semibold group">
               <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-primary/30 transition-all duration-300">
@@ -223,6 +233,7 @@ export function Sidebar() {
             </div>
           </div>
         </motion.div>
+        </>
       )}
     </AnimatePresence>
   );

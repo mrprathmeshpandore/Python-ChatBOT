@@ -1,5 +1,5 @@
 import React from 'react';
-import { PanelLeft, PanelRight, Moon, Sun, Monitor, LogOut } from 'lucide-react';
+import { Menu, PanelRight, Moon, Sun, Monitor, LogOut } from 'lucide-react';
 import { useUIStore } from '@/store/useUIStore';
 import { useAuthStore } from '@/store/authStore';
 import { useGoogleLogin } from '@react-oauth/google';
@@ -46,7 +46,7 @@ export function Header() {
         onClick={toggleSidebar}
         className="inline-flex h-9 w-9 items-center justify-center rounded-xl hover:bg-muted/80 text-muted-foreground hover:text-foreground transition-all duration-200 active:scale-95"
       >
-        <PanelLeft size={18} />
+        <Menu size={20} />
         <span className="sr-only">Toggle Sidebar</span>
       </button>
       
