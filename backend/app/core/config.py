@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     
     # Gemini API
     GOOGLE_API_KEY: str
-    
+    MODEL_PROVIDER: str = "gemini"
     GEMINI_MODEL: str = "gemini-3.6-flash"
     
     # Remote Embeddings
