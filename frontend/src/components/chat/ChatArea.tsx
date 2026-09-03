@@ -103,10 +103,6 @@ export function ChatArea({ chatId }: ChatAreaProps) {
   }, [messages, isStreaming]);
 
   const handleSendMessage = async (content: string) => {
-    if (!user) {
-      toast.error('Please log in to use the chatbot.');
-      return;
-    }
     const { setAbortController, setActiveSources } = useChatStore.getState();
     
     // 1. Synchronous & Immediate Optimistic UI rendering
@@ -306,18 +302,7 @@ export function ChatArea({ chatId }: ChatAreaProps) {
         style={{ left: sidebarOpen ? '260px' : '0' }}
       >
         <div className="max-w-4xl mx-auto w-full pointer-events-auto flex flex-col gap-3">
-          {!user && (
-            <div className="bg-card/90 backdrop-blur-md border border-border shadow-lg rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 mb-2 mx-auto w-full max-w-2xl">
-              <div className="text-sm text-foreground/90 font-medium">
-                Log in to get answers based on saved chats, plus create images and upload files.
-              </div>
-              <div className="flex gap-2 shrink-0">
-                <Button variant="outline" onClick={() => login()} className="rounded-full">Log in</Button>
-                <Button onClick={() => login()} className="rounded-full">Sign up for free</Button>
-              </div>
-            </div>
-          )}
-          <ChatInput onSend={handleSendMessage} isStreaming={isStreaming} disabled={!user} />
+          <ChatInput onSend={handleSendMessage} isStreaming={isStreaming} />
           <div className="text-center text-[11px] font-medium text-muted-foreground/60 tracking-wide">
             Python AI can make mistakes. Consider verifying important information.
           </div>

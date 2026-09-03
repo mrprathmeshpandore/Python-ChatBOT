@@ -16,12 +16,11 @@ router = APIRouter()
 async def read_messages(
     chat_id: str,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
     """Retrieve messages for a specific chat."""
-    result = await db.execute(select(Chat).where(Chat.id == chat_id, Chat.user_id == current_user.id))
+    result = await db.execute(select(Chat).where(Chat.id == chat_id))
     chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
@@ -35,11 +34,10 @@ async def read_messages(
 async def create_message(
     *,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
     message_in: MessageCreate,
 ) -> Any:
     """Create new message."""
-    result = await db.execute(select(Chat).where(Chat.id == message_in.chat_id, Chat.user_id == current_user.id))
+    result = await db.execute(select(Chat).where(Chat.id == message_in.chat_id))
     chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
