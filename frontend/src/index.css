@@ -1,0 +1,223 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    /* Light Theme (Vercel/Apple inspired) */
+    --background: 210 20% 98%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 230 100% 60%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+ 
+    --muted: 210 40% 92%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 230 100% 60%;
+ 
+    --radius: 1rem;
+    
+    --ai-bg-opacity: 0.05;
+  }
+ 
+  .dark {
+    /* Dark Theme (Linear/Copilot inspired deep black/navy) */
+    --background: 240 10% 4%;
+    --foreground: 210 40% 98%;
+ 
+    --card: 240 10% 6%;
+    --card-foreground: 210 40% 98%;
+ 
+    --popover: 240 10% 6%;
+    --popover-foreground: 210 40% 98%;
+ 
+    --primary: 230 100% 65%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 240 10% 12%;
+    --secondary-foreground: 210 40% 98%;
+ 
+    --muted: 240 10% 12%;
+    --muted-foreground: 215 20.2% 65.1%;
+ 
+    --accent: 240 10% 16%;
+    --accent-foreground: 210 40% 98%;
+ 
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+ 
+    --border: 240 10% 16%;
+    --input: 240 10% 16%;
+    --ring: 230 100% 65%;
+    
+    --ai-bg-opacity: 0.15;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .glass-panel {
+    @apply bg-background/70 backdrop-blur-xl border border-border/50 shadow-sm;
+  }
+  
+  .glass-card {
+    @apply bg-card/60 backdrop-blur-md border border-white/10 dark:border-white/5 shadow-sm;
+  }
+  
+  .glass-input {
+    @apply bg-background/50 backdrop-blur-md border border-border/50 shadow-inner focus-within:bg-background/80 transition-all duration-300;
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-400;
+  }
+
+  /* Custom Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/20 rounded-full hover:bg-muted-foreground/40 transition-colors;
+  }
+}
+
+/* AI Background Pattern (Neural Mesh) */
+.ai-bg-container {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: hsl(var(--background));
+}
+
+.ai-grid {
+  position: absolute;
+  inset: 0;
+  background-size: 40px 40px;
+  background-image: linear-gradient(to right, hsl(var(--foreground) / var(--ai-bg-opacity)) 1px, transparent 1px),
+                    linear-gradient(to bottom, hsl(var(--foreground) / var(--ai-bg-opacity)) 1px, transparent 1px);
+  mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent);
+  animation: grid-move 20s linear infinite;
+  opacity: 0.5;
+}
+
+.ai-glow-1 {
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 50vw;
+  height: 50vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.15) 0%, transparent 70%);
+  filter: blur(60px);
+  animation: float 15s ease-in-out infinite alternate;
+}
+
+.ai-glow-2 {
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 60vw;
+  height: 60vw;
+  border-radius: 50%;
+  background: radial-gradient(circle, hsl(280 80% 60% / 0.1) 0%, transparent 70%);
+  filter: blur(80px);
+  animation: float-delayed 18s ease-in-out infinite alternate;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(5%, 5%); }
+}
+
+@keyframes float-delayed {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(-5%, -5%); }
+}
+
+@keyframes grid-move {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(40px); }
+}
+
+/* Markdown Styling Improvements */
+.custom-markdown {
+  @apply leading-relaxed;
+}
+
+.custom-markdown p {
+  @apply mb-4 last:mb-0;
+}
+
+.custom-markdown h1, .custom-markdown h2, .custom-markdown h3 {
+  @apply font-semibold tracking-tight mt-6 mb-3 text-foreground;
+}
+
+.custom-markdown h1 { @apply text-2xl; }
+.custom-markdown h2 { @apply text-xl border-b pb-1; }
+.custom-markdown h3 { @apply text-lg; }
+
+.custom-markdown ul {
+  @apply list-disc list-outside ml-5 mb-4 space-y-1 text-foreground/90;
+}
+
+.custom-markdown ol {
+  @apply list-decimal list-outside ml-5 mb-4 space-y-1 text-foreground/90;
+}
+
+.custom-markdown blockquote {
+  @apply border-l-4 border-primary/50 pl-4 italic text-muted-foreground bg-muted/30 py-1 pr-4 rounded-r-md my-4;
+}
+
+.custom-markdown table {
+  @apply w-full text-sm text-left my-4 border-collapse overflow-hidden rounded-lg shadow-sm border;
+}
+
+.custom-markdown th {
+  @apply bg-muted/50 font-semibold p-3 border-b border-border;
+}
+
+.custom-markdown td {
+  @apply p-3 border-b border-border/50 text-foreground/90;
+}
+
+.custom-markdown tr:last-child td {
+  @apply border-0;
+}
+
+.custom-markdown a {
+  @apply text-primary font-medium underline underline-offset-4 hover:text-primary/80 transition-colors;
+}

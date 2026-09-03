@@ -1,0 +1,22 @@
+[cmdk-root] {
+  width: 100%;
+}
+
+[cmdk-input] {
+  font-family: inherit;
+  font-size: 14px;
+  width: 100%;
+  outline: none;
+  border: none;
+  background: transparent;
+}
+
+[cmdk-item] {
+  content-visibility: auto;
+  cursor: pointer;
+}
+
+[cmdk-item][data-selected='true'] {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
