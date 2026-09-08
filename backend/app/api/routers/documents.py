@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, desc
@@ -6,8 +6,10 @@ import uuid
 import os
 
 from app.core.database import get_db
+from app.api.deps import get_current_user_optional
 from app.models.chat import Chat
 from app.models.document import Document
+from app.models.user import User
 from app.schemas.document import Document as DocumentSchema
 from app.api.routers.rag import process_document_sync
 
@@ -20,14 +22,19 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.get("/", response_model=List[DocumentSchema])
 async def read_documents(
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     skip: int = 0,
     limit: int = 100,
     chat_id: str = None,
 ) -> Any:
-    """Retrieve all documents."""
+    """Retrieve documents for authenticated user."""
     query = select(Document)
     if chat_id:
         query = query.where(Document.chat_id == chat_id)
+    elif current_user:
+        query = query.where(Document.user_id == current_user.id)
+    else:
+        return []
     
     query = query.order_by(desc(Document.created_at)).offset(skip).limit(limit)
     result = await db.execute(query)
@@ -41,6 +48,7 @@ async def upload_document(
     file: UploadFile = File(...),
     chat_id: str = Form(None),
     background_tasks: BackgroundTasks,
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ) -> Any:
     """Upload a new document."""
     if chat_id:
@@ -61,6 +69,7 @@ async def upload_document(
         file_size = len(content)
         
     doc = Document(
+        user_id=current_user.id if current_user else None,
         chat_id=chat_id,
         filename=file.filename,
         file_type=file_extension,
@@ -68,6 +77,7 @@ async def upload_document(
         storage_url=file_path, # URL or Path
         status="processing"
     )
+
     db.add(doc)
     await db.commit()
     await db.refresh(doc)

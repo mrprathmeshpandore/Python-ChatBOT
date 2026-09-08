@@ -34,7 +34,10 @@ api.interceptors.response.use(
       return Promise.reject(error)
     }
 
-    if (error.response?.status >= 500) {
+    if (error.response?.status === 401) {
+      useAuthStore.getState().logout();
+      toast.error("Session expired. Please log in again.");
+    } else if (error.response?.status >= 500) {
       toast.error("Server error. Please try again.")
     } else if (
       error.response?.data?.detail &&

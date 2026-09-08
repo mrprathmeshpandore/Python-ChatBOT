@@ -3,6 +3,7 @@ import { Menu, PanelRight, Moon, Sun, Monitor, LogOut } from 'lucide-react';
 import { useUIStore } from '@/store/useUIStore';
 import { useAuthStore } from '@/store/authStore';
 import { useGoogleLogin } from '@react-oauth/google';
+import { useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { toast } from 'sonner';
 export function Header() {
   const { toggleSidebar, toggleRightPanel, theme, setTheme, rightPanelOpen } = useUIStore();
   const { user, token, setAuth, logout } = useAuthStore();
+  const queryClient = useQueryClient();
 
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -29,6 +31,7 @@ export function Header() {
         }
         
         const data = await res.json();
+        queryClient.clear();
         setAuth(data.access_token, data.user);
         toast.success(`Welcome, ${data.user.name}!`);
       } catch (error) {
@@ -113,6 +116,7 @@ export function Header() {
             </Avatar>
             <button
               onClick={() => {
+                queryClient.clear();
                 logout();
                 toast.success('Logged out successfully');
               }}
@@ -128,6 +132,7 @@ export function Header() {
               Log in
             </Button>
             <Button onClick={() => login()} className="text-sm font-medium rounded-full px-4 h-9 bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm">
+
               Sign up for free
             </Button>
           </div>

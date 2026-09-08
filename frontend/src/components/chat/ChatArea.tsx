@@ -12,6 +12,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { NeuralNetworkCanvas } from './NeuralNetworkCanvas';
 
 interface ChatAreaProps {
   chatId?: string;
@@ -39,13 +40,15 @@ export function ChatArea({ chatId }: ChatAreaProps) {
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const res = await fetch('http://localhost:8000/api/v1/auth/google', {
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1';
+        const res = await fetch(`${apiUrl}/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ token: tokenResponse.access_token }),
         });
         if (!res.ok) throw new Error('Failed to authenticate');
         const data = await res.json();
+        queryClient.clear();
         setAuth(data.access_token, data.user);
         toast.success(`Welcome, ${data.user.name}!`);
       } catch (error) {
@@ -251,7 +254,9 @@ export function ChatArea({ chatId }: ChatAreaProps) {
   }
 
   return (
-    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 sm:px-6 pb-4 relative">
+    <div className="flex flex-col h-full w-full max-w-4xl mx-auto px-4 sm:px-6 pb-4 relative z-0">
+      {/* Live Animated AI Neural Network Canvas Background */}
+      <NeuralNetworkCanvas />
       {messages.length === 0 ? (
         <div className="flex-1 flex flex-col items-center justify-center text-center -mt-10">
           <motion.div 

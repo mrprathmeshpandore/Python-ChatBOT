@@ -1,10 +1,10 @@
-from typing import Any, List
+from typing import Any, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, asc
 
 from app.core.database import get_db
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user_optional
 from app.models.chat import Chat
 from app.models.message import Message
 from app.models.user import User
@@ -16,6 +16,7 @@ router = APIRouter()
 async def read_messages(
     chat_id: str,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     skip: int = 0,
     limit: int = 100,
 ) -> Any:
@@ -24,6 +25,10 @@ async def read_messages(
     chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
+
+    if chat.user_id is not None:
+        if not current_user or chat.user_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access messages in this chat")
 
     query = select(Message).where(Message.chat_id == chat_id).order_by(asc(Message.created_at)).offset(skip).limit(limit)
     result = await db.execute(query)
@@ -35,12 +40,17 @@ async def create_message(
     *,
     db: AsyncSession = Depends(get_db),
     message_in: MessageCreate,
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ) -> Any:
     """Create new message."""
     result = await db.execute(select(Chat).where(Chat.id == message_in.chat_id))
     chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
+
+    if chat.user_id is not None:
+        if not current_user or chat.user_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to post messages to this chat")
 
     message = Message(
         chat_id=message_in.chat_id,
@@ -52,3 +62,4 @@ async def create_message(
     await db.commit()
     await db.refresh(message)
     return message
+

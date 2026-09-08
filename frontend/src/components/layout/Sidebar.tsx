@@ -4,6 +4,7 @@ import { MessageSquarePlus, PanelLeftClose, Settings, FileText, MessageSquare, S
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useUIStore } from '@/store/useUIStore';
+import { useAuthStore } from '@/store/authStore';
 import { useChats } from '@/hooks/useChat';
 import { isToday, isYesterday, isThisWeek, parseISO } from 'date-fns';
 import { api } from '@/lib/api';
@@ -38,6 +39,7 @@ export function Sidebar() {
     };
   }, []);
 
+  const { user } = useAuthStore();
   const { data: chats = [] } = useChats();
 
   const deleteChat = async (id: string, e: React.MouseEvent) => {
@@ -183,11 +185,26 @@ export function Sidebar() {
 
           {/* Chat List */}
           <div className="flex-1 overflow-y-auto px-2 py-2 space-y-1 custom-scrollbar">
-            {renderChatGroup("Pinned", groupedChats.pinned, <Pin size={10} />)}
-            {renderChatGroup("Today", groupedChats.today)}
-            {renderChatGroup("Yesterday", groupedChats.yesterday)}
-            {renderChatGroup("Previous 7 Days", groupedChats.last7Days)}
-            {renderChatGroup("Older", groupedChats.older)}
+            {!user ? (
+              <div className="px-3 py-6 text-center rounded-lg bg-muted/20 border border-border/40 my-2">
+                <p className="text-xs font-medium text-muted-foreground mb-1">Guest Mode</p>
+                <p className="text-[11px] text-muted-foreground/70 leading-relaxed">
+                  Log in to save and access your private chat history across devices.
+                </p>
+              </div>
+            ) : chats.length === 0 ? (
+              <div className="px-3 py-6 text-center">
+                <p className="text-xs text-muted-foreground">No chat history yet.</p>
+              </div>
+            ) : (
+              <>
+                {renderChatGroup("Pinned", groupedChats.pinned, <Pin size={10} />)}
+                {renderChatGroup("Today", groupedChats.today)}
+                {renderChatGroup("Yesterday", groupedChats.yesterday)}
+                {renderChatGroup("Previous 7 Days", groupedChats.last7Days)}
+                {renderChatGroup("Older", groupedChats.older)}
+              </>
+            )}
           </div>
 
           {/* Bottom Actions */}

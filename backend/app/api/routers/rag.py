@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
 from fastapi.responses import StreamingResponse
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,8 +6,10 @@ from sqlalchemy import select, asc
 import os
 from app.core.database import get_db
 from app.core.config import settings
+from app.api.deps import get_current_user_optional
 from app.models.chat import Chat
 from app.models.message import Message
+from app.models.user import User
 from app.schemas.message import MessageCreate
 from app.services.rag_service import rag_service
 
@@ -22,13 +24,19 @@ async def stream_chat_response(
     message_in: MessageCreate,
     background_tasks: BackgroundTasks,
     db: AsyncSession = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ) -> Any:
     """Stream AI response using RAG."""
-    # Verify chat exists
+    # Verify chat exists and user owns it
     result = await db.execute(select(Chat).where(Chat.id == chat_id))
     chat = result.scalar_one_or_none()
     if not chat:
         raise HTTPException(status_code=404, detail="Chat not found")
+
+    if chat.user_id is not None:
+        if not current_user or chat.user_id != current_user.id:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not authorized to access this chat")
+
 
     # Save User Message
     user_msg = Message(
