@@ -10,6 +10,8 @@ import { isToday, isYesterday, isThisWeek, parseISO } from 'date-fns';
 import { api } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 
+import { DeleteChatModal } from '../chat/DeleteChatModal';
+
 export function Sidebar() {
   const { sidebarOpen, toggleSidebar } = useUIStore();
   const location = useLocation();
@@ -17,6 +19,8 @@ export function Sidebar() {
   const queryClient = useQueryClient();
   const [searchQuery, setSearchQuery] = useState('');
   const [healthStatus, setHealthStatus] = useState<'checking' | 'running' | 'error'>('checking');
+  const [chatToDelete, setChatToDelete] = useState<{ id: string; title: string } | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -42,13 +46,25 @@ export function Sidebar() {
   const { user } = useAuthStore();
   const { data: chats = [] } = useChats();
 
-  const deleteChat = async (id: string, e: React.MouseEvent) => {
+  const promptDeleteChat = (id: string, title: string, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (confirm("Delete this chat?")) {
+    setChatToDelete({ id, title });
+  };
+
+  const confirmDeleteChat = async () => {
+    if (!chatToDelete) return;
+    const id = chatToDelete.id;
+    setDeletingId(id);
+    try {
       await api.delete(`/chats/${id}`);
       queryClient.invalidateQueries({ queryKey: ['chats'] });
-      if (location.pathname === `/c/${id}`) navigate('/');
+      if (location.pathname === `/c/${id}`) {
+        navigate('/');
+      }
+    } finally {
+      setDeletingId(null);
+      setChatToDelete(null);
     }
   };
 
@@ -90,31 +106,41 @@ export function Sidebar() {
           {icon} {title}
         </div>
         <div className="space-y-0.5">
-          {items.map((chat) => (
-            <Link
-              key={chat.id}
-              to={`/c/${chat.id}`}
-              className={cn(
-                "group flex w-full items-center justify-between gap-2.5 rounded-lg px-2 py-2 text-sm transition-all duration-200",
-                location.pathname === `/c/${chat.id}`
-                  ? "bg-primary/15 text-primary font-medium shadow-sm border border-primary/20"
-                  : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-              )}
-            >
-              <div className="flex items-center gap-2.5 overflow-hidden w-full">
-                <MessageSquare size={14} className="shrink-0" />
-                <span className="truncate flex-1 text-left">{chat.title}</span>
-              </div>
-              <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                <button onClick={(e) => togglePin(chat.id, chat.is_pinned, e)} className="p-1 hover:text-foreground">
-                  <Pin size={12} className={chat.is_pinned ? "fill-current" : ""} />
-                </button>
-                <button onClick={(e) => deleteChat(chat.id, e)} className="p-1 hover:text-destructive">
-                  <Trash size={12} />
-                </button>
-              </div>
-            </Link>
-          ))}
+          <AnimatePresence initial={false}>
+            {items.map((chat) => (
+              <motion.div
+                key={chat.id}
+                layout
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -40, filter: 'blur(4px)', scale: 0.95 }}
+                transition={{ duration: 0.45, ease: 'easeInOut' }}
+              >
+                <Link
+                  to={`/c/${chat.id}`}
+                  className={cn(
+                    "group flex w-full items-center justify-between gap-2.5 rounded-lg px-2 py-2 text-sm transition-all duration-200",
+                    location.pathname === `/c/${chat.id}`
+                      ? "bg-primary/15 text-primary font-medium shadow-sm border border-primary/20"
+                      : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+                  )}
+                >
+                  <div className="flex items-center gap-2.5 overflow-hidden w-full">
+                    <MessageSquare size={14} className="shrink-0" />
+                    <span className="truncate flex-1 text-left">{chat.title}</span>
+                  </div>
+                  <div className="flex items-center opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                    <button onClick={(e) => togglePin(chat.id, chat.is_pinned, e)} className="p-1 hover:text-foreground">
+                      <Pin size={12} className={chat.is_pinned ? "fill-current" : ""} />
+                    </button>
+                    <button onClick={(e) => promptDeleteChat(chat.id, chat.title, e)} className="p-1 hover:text-destructive">
+                      <Trash size={12} />
+                    </button>
+                  </div>
+                </Link>
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       </div>
     );
@@ -252,6 +278,14 @@ export function Sidebar() {
         </motion.div>
         </>
       )}
+
+      {/* Premium Animated Delete Confirmation Modal */}
+      <DeleteChatModal
+        isOpen={!!chatToDelete}
+        chatTitle={chatToDelete?.title}
+        onCancel={() => setChatToDelete(null)}
+        onConfirm={confirmDeleteChat}
+      />
     </AnimatePresence>
   );
 }
