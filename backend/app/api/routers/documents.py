@@ -22,19 +22,14 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 @router.get("/", response_model=List[DocumentSchema])
 async def read_documents(
     db: AsyncSession = Depends(get_db),
-    current_user: Optional[User] = Depends(get_current_user_optional),
     skip: int = 0,
     limit: int = 100,
     chat_id: str = None,
 ) -> Any:
-    """Retrieve documents for authenticated user."""
+    """Retrieve all documents globally."""
     query = select(Document)
     if chat_id:
         query = query.where(Document.chat_id == chat_id)
-    elif current_user:
-        query = query.where(Document.user_id == current_user.id)
-    else:
-        return []
     
     query = query.order_by(desc(Document.created_at)).offset(skip).limit(limit)
     result = await db.execute(query)

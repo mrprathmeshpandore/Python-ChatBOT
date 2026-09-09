@@ -15,7 +15,7 @@ export default function KnowledgeBase() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="col-span-1 lg:col-span-2 space-y-6">
           <div className="bg-card border rounded-xl shadow-sm p-6">
-            <h2 className="text-xl font-semibold mb-4">Your Documents</h2>
+            <h2 className="text-xl font-semibold mb-4">Available Documents</h2>
             <DocumentList />
           </div>
         </div>
