@@ -26,6 +26,19 @@ class RAGService:
             chunk_overlap=200
         )
 
+    def is_owner_query(self, query: str) -> bool:
+        if not query or not query.strip():
+            return False
+        q_lower = query.lower().strip()
+        owner_keywords = [
+            "owner", "creator", "developer", "devloper", "maker", "author", "malak", "boss", "ओनर", "मालक", "क्रिएटर", "डेव्हलपर",
+            "who created", "who made", "who built", "who developed", "who designed", "who is your owner", "who owns",
+            "tuza owner", "tuzha owner", "tuze owner", "tumhara owner", "aapka owner", "koni banavla", "koni banavlay",
+            "koni banavlo", "koni tayar", "koni tiyar", "kisne banaya", "kiska bot", "kiska hai", "kon ahe owner", "owner kon",
+            "creator kon", "developer kon", "prathmesh", "pandore", "who are you", "who r u", "tu kon ahes", "tu kon ahe"
+        ]
+        return any(kw in q_lower for kw in owner_keywords)
+
     def is_python_related(self, query: str, chat_history: List[Message] = None) -> bool:
         if not query or not query.strip():
             return False
@@ -37,15 +50,8 @@ class RAGService:
         if q_lower in greetings or any(q_lower.startswith(g + " ") for g in greetings) or q_lower == "hi there":
             return True
             
-        owner_patterns = [
-            r"\bowner\b", r"\bcreator\b", r"\bdeveloper\b", r"\bwho created\b", r"\bwho made\b", r"\bwho built\b",
-            r"\bwho is your owner\b", r"\bwho owns you\b", r"\btuza owner\b", r"\btuzha owner\b", r"\btuma owner\b",
-            r"\bkon ahe owner\b", r"\bowner kon\b", r"\bcreator kon\b", r"\bdeveloper kon\b", r"\btula koni banavla\b",
-            r"\btula koni banavlay\b", r"\bmalak\b", r"\bwho developed\b", r"\bwho designed\b", r"\bprathmesh\b"
-        ]
-        for opattern in owner_patterns:
-            if re.search(opattern, q_lower):
-                return True
+        if self.is_owner_query(query):
+            return True
             
         # 2. Key Python topics, libraries, frameworks, concepts, and keywords
         python_patterns = [
@@ -300,10 +306,18 @@ class RAGService:
 
             client = genai.Client(api_key=settings.GOOGLE_API_KEY)
             
-            # Always fetch KB context first
-            context, chunks_data = await self.get_relevant_context(db, query)
-            # Commit read transaction immediately so DB session is NOT idle-in-transaction during LLM call
-            await db.commit()
+            # If query is an owner query or greeting, skip KB document retrieval to avoid attaching irrelevant document chunks
+            q_lower = query.lower().strip()
+            greetings = ["hi", "hello", "hey", "namaste", "नमस्कार", "नमस्ते", "good morning", "good evening", "namaskar"]
+            is_greeting = q_lower in greetings or any(q_lower.startswith(g + " ") for g in greetings) or q_lower == "hi there"
+            
+            if self.is_owner_query(query) or is_greeting:
+                context = ""
+                chunks_data = []
+            else:
+                # Fetch KB context for technical programming queries
+                context, chunks_data = await self.get_relevant_context(db, query)
+                await db.commit()
 
             if chunks_data:
                 chunk_obj = {
