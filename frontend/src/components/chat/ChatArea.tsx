@@ -309,7 +309,7 @@ export function ChatArea({ chatId }: ChatAreaProps) {
         <div className="max-w-4xl mx-auto w-full pointer-events-auto flex flex-col gap-3">
           <ChatInput onSend={handleSendMessage} isStreaming={isStreaming} />
           <div className="text-center text-[11px] font-medium text-muted-foreground/60 tracking-wide">
-            Python AI can make mistakes. Consider verifying important information.
+            Knowledge AI RAG System • Powered by FastAPI & PgVector Architecture
           </div>
         </div>
       </div>

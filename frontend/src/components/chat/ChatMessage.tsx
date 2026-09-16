@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { User, Bot, Copy, ThumbsUp, ThumbsDown, RotateCcw, Check } from 'lucide-react';
+import { User, Bot, Copy, ThumbsUp, ThumbsDown, RotateCcw, Check, Zap, Sparkles, FileText } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
@@ -9,6 +9,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import 'katex/dist/katex.min.css';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { RAGLoadingAnimation } from './RAGLoadingAnimation';
 
 interface ChatMessageProps {
   role: string;
@@ -50,16 +51,19 @@ export function ChatMessage({ role, content, isStreaming, metadata }: ChatMessag
       {/* Content */}
       <div className="flex-1 space-y-2 overflow-hidden w-full">
         <div className="font-semibold text-sm flex items-center justify-between">
-          <span>{isUser ? "You" : "Python AI"}</span>
+          <div className="flex items-center gap-2">
+            <span>{isUser ? "You" : "Knowledge AI"}</span>
+            {!isUser && (
+              <span className="inline-flex items-center gap-1 text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 font-medium">
+                <Zap size={10} /> RAG Engine
+              </span>
+            )}
+          </div>
         </div>
         
         <div className="prose prose-sm md:prose-base dark:prose-invert max-w-none break-words custom-markdown w-full">
           {content === '' && isStreaming ? (
-            <div className="flex items-center space-x-1 h-6">
-              <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-              <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-              <span className="w-2 h-2 bg-primary rounded-full animate-bounce"></span>
-            </div>
+            <RAGLoadingAnimation />
           ) : (
             <ReactMarkdown 
               remarkPlugins={[remarkGfm, remarkMath]}
@@ -107,21 +111,33 @@ export function ChatMessage({ role, content, isStreaming, metadata }: ChatMessag
         
         {/* Sources Badges */}
         {metadata?.sources && metadata.sources.length > 0 && (
-          <div className="pt-2 flex flex-wrap gap-2">
-            {metadata.sources.map((source: any, i: number) => (
-              <a
-                key={i}
-                href={source.metadata?.source || '#'}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors"
-                title={source.metadata?.source || 'Source Document'}
-              >
-                <span className="truncate max-w-[200px]">
-                  {source.metadata?.source ? source.metadata.source.split('/').pop() : `Source ${i + 1}`}
-                </span>
-              </a>
-            ))}
+          <div className="pt-3 border-t border-border/40 mt-3">
+            <div className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2 flex items-center gap-1.5">
+              <Sparkles size={12} className="text-primary" />
+              RAG Vector Retrieval Sources (PgVector + BM25)
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {metadata.sources.map((source: any, i: number) => (
+                <a
+                  key={i}
+                  href={source.metadata?.source || '#'}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-all shadow-sm"
+                  title={source.metadata?.source || 'Source Document'}
+                >
+                  <FileText size={12} />
+                  <span className="truncate max-w-[200px]">
+                    {source.metadata?.source ? source.metadata.source.split('/').pop() : `Knowledge Chunk ${i + 1}`}
+                  </span>
+                  {source.similarity && (
+                    <span className="text-[10px] font-mono bg-primary/20 px-1.5 py-0.5 rounded-md">
+                      {(source.similarity * 100).toFixed(0)}%
+                    </span>
+                  )}
+                </a>
+              ))}
+            </div>
           </div>
         )}
         
