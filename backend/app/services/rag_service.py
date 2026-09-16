@@ -33,8 +33,9 @@ class RAGService:
         owner_keywords = [
             "owner", "creator", "developer", "devloper", "maker", "author", "malak", "boss", "ओनर", "मालक", "क्रिएटर", "डेव्हलपर",
             "who created", "who made", "who built", "who developed", "who designed", "who is your owner", "who owns",
-            "tuza owner", "tuzha owner", "tuze owner", "tumhara owner", "aapka owner", "koni banavla", "koni banavlay",
-            "koni banavlo", "koni tayar", "koni tiyar", "kisne banaya", "kiska bot", "kiska hai", "kon ahe owner", "owner kon",
+            "tuza owner", "tuzha owner", "tuze owner", "tumhara owner", "aapka owner",
+            "koni banavla", "koni banavlay", "koni banavlo", "koni banval", "koni banvala", "koni banvalay", "koni banvle", "koni banvlay",
+            "koni tayar", "koni tiyar", "kisne banaya", "kiska bot", "kiska hai", "kon ahe owner", "owner kon",
             "creator kon", "developer kon", "prathmesh", "pandore", "who are you", "who r u", "tu kon ahes", "tu kon ahe"
         ]
         return any(kw in q_lower for kw in owner_keywords)
@@ -335,7 +336,8 @@ class RAGService:
                 "--------------------------------------------------\n\n"
                 "1. SMART DOMAIN GUARD & FOLLOW-UPS (CRITICAL)\n"
                 "• ALWAYS maintain context from the previous messages.\n"
-                "• OWNER / CREATOR / DEVELOPER IDENTITY: Whenever the user asks who your owner, creator, or developer is (e.g., \"Who is your owner?\", \"Tuza owner kon ahe?\", \"Who created you?\", \"Tula koni banavlay?\", \"Who built you?\"), you MUST answer clearly that you were created and are owned by **Prathmesh Pandore** (प्रथमेश पंडोरे). Match the language of the prompt (English, Marathi, or Hindi). In Marathi script, always spell the name as **प्रथमेश पंडोरे**.\n"
+                "• OWNER / CREATOR / DEVELOPER IDENTITY: Whenever the user asks who your owner, creator, or developer is (e.g., \"Who is your owner?\", \"Tuza owner kon ahe?\", \"Who created you?\", \"Koni Banval Tula?\", \"Who built you?\"), you MUST answer clearly that you were created and are owned by **Prathmesh Pandore** (प्रथमेश पंडोरे). Match the language of the prompt (English, Marathi, or Hindi).\n"
+                "• CRITICAL MARATHI SPELLING RULE FOR NAME: In Devanagari / Marathi script, ALWAYS write the surname strictly as **पंडोरे** (PANDORE). NEVER write 'पांडोरे' or 'पांदोरे' (do NOT put a kana 'ा' on प). The full Marathi name MUST be written strictly as **प्रथमेश पंडोरे**.\n"
                 "• If the user asks a follow-up question (e.g., \"Explain it\", \"Why?\", \"Give an example\", \"Summarize\", \"Explain in 2 lines\", \"Advantages?\"), NEVER reject it. You MUST assume it refers to the previous Python-related topic and answer it directly.\n"
                 "• If the user says a greeting (e.g., \"Hi\", \"Hello\", \"Hey\", \"Namaste\", \"नमस्कार\", \"नमस्ते\"), DO NOT reject it. Respond naturally based on their language, e.g., \"Hello! What would you like to learn about Python today?\" or \"नमस्कार! आज Python मध्ये काय शिकायचं आहे?\"\n"
                 "• REJECT ONLY completely unrelated topics (e.g., \"How to cook pasta\", \"Write a Java program\"). For completely unrelated topics, politely reply: \"Sorry, I am a Python-only AI Assistant. I can answer only Python programming, Python frameworks, AI with Python, and related topics.\"\n\n"
