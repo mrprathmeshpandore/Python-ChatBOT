@@ -12,10 +12,20 @@ def is_python_related(query: str, chat_history: List[Message] = None) -> bool:
         
     q_lower = query.lower().strip()
     
-    # 1. Allow Greetings
+    # 1. Allow Greetings and Owner/Creator/Developer identity queries
     greetings = ["hi", "hello", "hey", "namaste", "नमस्कार", "नमस्ते", "good morning", "good evening", "namaskar"]
     if q_lower in greetings or any(q_lower.startswith(g + " ") for g in greetings) or q_lower == "hi there":
         return True
+        
+    owner_patterns = [
+        r"\bowner\b", r"\bcreator\b", r"\bdeveloper\b", r"\bwho created\b", r"\bwho made\b", r"\bwho built\b",
+        r"\bwho is your owner\b", r"\bwho owns you\b", r"\btuza owner\b", r"\btuzha owner\b", r"\btuma owner\b",
+        r"\bkon ahe owner\b", r"\bowner kon\b", r"\bcreator kon\b", r"\bdeveloper kon\b", r"\btula koni banavla\b",
+        r"\btula koni banavlay\b", r"\bmalak\b", r"\bwho developed\b", r"\bwho designed\b", r"\bprathmesh\b"
+    ]
+    for opattern in owner_patterns:
+        if re.search(opattern, q_lower):
+            return True
         
     # 2. Key Python topics, libraries, frameworks, concepts, and keywords
     python_patterns = [
