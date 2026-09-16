@@ -64,7 +64,7 @@ export function Header() {
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
           </span>
-          ⚡ Custom RAG Engine Active
+          Python AI Ready
         </motion.div>
       </div>
       

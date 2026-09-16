@@ -172,7 +172,7 @@ export function Sidebar() {
               <div className="h-7 w-7 rounded-lg bg-gradient-to-br from-primary to-blue-500 flex items-center justify-center shadow-md group-hover:shadow-primary/30 transition-all duration-300">
                 <span className="text-white text-xs font-bold">AI</span>
               </div>
-              <span className="truncate text-foreground font-medium tracking-tight">Knowledge RAG AI</span>
+              <span className="truncate text-foreground font-medium tracking-tight">Python AI</span>
             </Link>
             <button
               onClick={toggleSidebar}
@@ -261,15 +261,15 @@ export function Sidebar() {
               Settings
             </Link>
 
-            <div className="pt-2 mt-2 border-t border-border/40">
+            <div className="pt-2 mt-2 border-t">
               <div className="flex items-center justify-between px-2 py-1">
-                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">RAG System Status</span>
+                <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">Backend Status</span>
                 <span className="flex items-center gap-1.5 text-xs font-medium">
                   {healthStatus === 'checking' && <span className="h-2 w-2 rounded-full bg-yellow-500 animate-pulse" />}
-                  {healthStatus === 'running' && <span className="h-2 w-2 rounded-full bg-green-500 shadow-sm shadow-green-500/50" />}
+                  {healthStatus === 'running' && <span className="h-2 w-2 rounded-full bg-green-500" />}
                   {healthStatus === 'error' && <span className="h-2 w-2 rounded-full bg-red-500" />}
                   <span className="text-xs text-slate-400 font-medium">
-                    {healthStatus === 'checking' ? 'Connecting RAG...' : healthStatus === 'running' ? 'RAG Engine Online' : 'RAG Engine Offline'}
+                    {healthStatus === 'checking' ? 'Connecting...' : healthStatus === 'running' ? 'Gemini API Online' : 'Gemini API Offline'}
                   </span>
                 </span>
               </div>
