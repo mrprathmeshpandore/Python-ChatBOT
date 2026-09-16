@@ -32,20 +32,10 @@ class RAGService:
             
         q_lower = query.lower().strip()
         
-        # 1. Allow Greetings and Owner/Creator/Developer identity queries
+        # 1. Allow Greetings
         greetings = ["hi", "hello", "hey", "namaste", "नमस्कार", "नमस्ते", "good morning", "good evening", "namaskar"]
         if q_lower in greetings or any(q_lower.startswith(g + " ") for g in greetings) or q_lower == "hi there":
             return True
-            
-        owner_patterns = [
-            r"\bowner\b", r"\bcreator\b", r"\bdeveloper\b", r"\bwho created\b", r"\bwho made\b", r"\bwho built\b",
-            r"\bwho is your owner\b", r"\bwho owns you\b", r"\btuza owner\b", r"\btuzha owner\b", r"\btuma owner\b",
-            r"\bkon ahe owner\b", r"\bowner kon\b", r"\bcreator kon\b", r"\bdeveloper kon\b", r"\btula koni banavla\b",
-            r"\btula koni banavlay\b", r"\bmalak\b", r"\bwho developed\b", r"\bwho designed\b", r"\bprathmesh\b"
-        ]
-        for opattern in owner_patterns:
-            if re.search(opattern, q_lower):
-                return True
             
         # 2. Key Python topics, libraries, frameworks, concepts, and keywords
         python_patterns = [
@@ -315,13 +305,12 @@ class RAGService:
                 
             # Construct Refined Production-Ready Knowledge AI System Prompt
             base_system_prompt = (
-                "You are Knowledge AI, a professional Python Programming Assistant created and owned by Prathmesh Pandore.\n\n"
+                "You are Knowledge AI, a professional Python Programming Assistant.\n\n"
                 "Your primary purpose is to teach Python clearly, accurately, and professionally.\n\n"
                 "You specialize ONLY in Python programming, frameworks (FastAPI, Flask, Django), Data Science (NumPy, Pandas), Machine Learning, AI with Python, LangChain, RAG, and related ecosystem topics.\n\n"
                 "--------------------------------------------------\n\n"
                 "1. SMART DOMAIN GUARD & FOLLOW-UPS (CRITICAL)\n"
                 "• ALWAYS maintain context from the previous messages.\n"
-                "• OWNER / CREATOR / DEVELOPER IDENTITY: Whenever the user asks who your owner, creator, or developer is (e.g., \"Who is your owner?\", \"Tuza owner kon ahe?\", \"Who created you?\", \"Tula koni banavlay?\", \"Who built you?\"), you MUST answer clearly that you were created and are owned by **Prathmesh Pandore** (प्रथमेश पांडोरे). Match the language of the prompt (English, Marathi, or Hindi).\n"
                 "• If the user asks a follow-up question (e.g., \"Explain it\", \"Why?\", \"Give an example\", \"Summarize\", \"Explain in 2 lines\", \"Advantages?\"), NEVER reject it. You MUST assume it refers to the previous Python-related topic and answer it directly.\n"
                 "• If the user says a greeting (e.g., \"Hi\", \"Hello\", \"Hey\", \"Namaste\", \"नमस्कार\", \"नमस्ते\"), DO NOT reject it. Respond naturally based on their language, e.g., \"Hello! What would you like to learn about Python today?\" or \"नमस्कार! आज Python मध्ये काय शिकायचं आहे?\"\n"
                 "• REJECT ONLY completely unrelated topics (e.g., \"How to cook pasta\", \"Write a Java program\"). For completely unrelated topics, politely reply: \"Sorry, I am a Python-only AI Assistant. I can answer only Python programming, Python frameworks, AI with Python, and related topics.\"\n\n"
